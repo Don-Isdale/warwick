@@ -1,11 +1,41 @@
 <script>
+	import RecorderDialog from './RecorderDialog.svelte';
+	import  'WebAudioRecorder';
+
+  if (false) {
+    var audioContext = new AudioContext;
+    var mixer = audioContext.createGain();
+
+    let audioRecorder = new window.WebAudioRecorder(mixer, {
+      workerDir: "build/"     // must end with slash
+    });
+  }
+
+  let recorderDialogFlag;
+
+  async function loadRecorderDialog() {
+    recorderDialogFlag = true;
+  }
+
+
 	export let name;
+
 </script>
 
 <main>
 	<h1>Hello {name}!</h1>
 	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
 </main>
+
+<button on:click={loadRecorderDialog()}>
+  Show the Recorder dialog
+</button>
+
+{#if recorderDialogFlag}
+{/if}
+  <RecorderDialog/>
+
+
 
 <style>
 	main {

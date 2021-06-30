@@ -5,7 +5,7 @@
   "scripts": {
     "build": "rollup -c",
     "dev": "rollup -c -w",
-    "start": "sirv public --no-clear"
+    "start": "NODE_OPTIONS=--inspect sirv public --no-clear"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^17.0.0",
@@ -18,6 +18,8 @@
     "svelte": "^3.0.0"
   },
   "dependencies": {
-    "sirv-cli": "^1.0.0"
+    "rollup-plugin-web-worker-loader": "^1.6.1",
+    "sirv-cli": "^1.0.0",
+    "web-audio-recorder-js": "file:../warwick_/web-audio-recorder-js"
   }
 }
