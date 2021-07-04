@@ -2,10 +2,18 @@
 import { onMount } from 'svelte';
 import jQuery from 'jquery';
 let jQ = jQuery;
-import jQModal from 'jquery-modal';
+
+  import { getContext } from 'svelte';
+  const { open, close } = getContext('simple-modal');
+
+  import ModalLoading from './ModalLoading.svelte';
+  import ModalProgress from './ModalProgress.svelte';
+  import ModalError from './ModalError.svelte';
+
+  let modalProgress_progress;
 
  onMount(function() {
-  let _audioInLevel, _audioInSelect, _bufferSize, _cancel, _dateTime, _echoCancellation, _encoding, _encodingOption, _encodingProcess, _modalError, _modalLoading, _modalProgress, _record, _recording, _recordingList, _reportInterval, _testToneLevel, _timeDisplay, _timeLimit, BUFFER_SIZE, ENCODING_OPTION, MP3_BIT_RATE, OGG_KBPS, OGG_QUALITY, URL, audioContext, audioIn, audioInLevel, audioRecorder, defaultBufSz, disableControlsOnRecord, encodingProcess, iDefBufSz, minSecStr, mixer, onChangeAudioIn, onError, onGotAudioIn, onGotDevices, optionValue, plural, progressComplete, saveRecording, setProgress, startRecording, stopRecording, testTone, testToneLevel, updateBufferSizeText, updateDateTime;
+  let _audioInLevel, _audioInSelect, _bufferSize, _cancel, _dateTime, _echoCancellation, _encoding, _encodingOption, _encodingProcess, modalError, modalLoading, modalProgress,  _record, _recording, _recordingList, _reportInterval, _testToneLevel, _timeDisplay, _timeLimit, BUFFER_SIZE, ENCODING_OPTION, MP3_BIT_RATE, OGG_KBPS, OGG_QUALITY, URL, audioContext, audioIn, audioInLevel, audioRecorder, defaultBufSz, disableControlsOnRecord, encodingProcess, iDefBufSz, minSecStr, mixer, onChangeAudioIn, onError, onGotAudioIn, onGotDevices, optionValue, plural, progressComplete, saveRecording, setProgress, startRecording, stopRecording, testTone, testToneLevel, updateBufferSizeText, updateDateTime;
 
   navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
 
@@ -49,11 +57,6 @@ import jQModal from 'jquery-modal';
 
   _recordingList = jQ('#recording-list');
 
-  _modalLoading = jQ('#modal-loading');
-
-  _modalProgress = jQ('#modal-progress');
-
-  _modalError = jQ('#modal-error');
 
   _audioInLevel.attr('disabled', false);
 
@@ -121,13 +124,13 @@ import jQModal from 'jquery-modal';
   audioRecorder = new WebAudioRecorder(mixer, {
     workerDir: 'js/',
     onEncoderLoading: function(recorder, encoding) {
-      _modalLoading.find('.modal-title').html("Loading " + (encoding.toUpperCase()) + " encoder ...");
-      _modalLoading.modal('show');
+      let title = "Loading " + (encoding.toUpperCase()) + " encoder ...";
+      open(ModalLoading, { title });
     }
   });
 
   audioRecorder.onEncoderLoaded = function() {
-    _modalLoading.modal('hide');
+    close(ModalLoading);
   };
 
   _testToneLevel.on('input', function() {
@@ -158,8 +161,7 @@ import jQModal from 'jquery-modal';
   };
 
   onError = function(msg) {
-    _modalError.find('.alert').html(msg);
-    _modalError.modal('show');
+    open(ModalError, {message : msg});
   };
 
   if ((navigator.mediaDevices != null) && (navigator.mediaDevices.enumerateDevices != null)) {
@@ -365,18 +367,16 @@ import jQModal from 'jquery-modal';
   progressComplete = false;
 
   setProgress = function(progress) {
-    var percent;
-    percent = "" + ((progress * 100).toFixed(1)) + "%";
-    _modalProgress.find('.progress-bar').attr('style', "width: " + percent + ";");
-    _modalProgress.find('.text-center').html(percent);
+    modalProgress_progress = progress;
     progressComplete = progress === 1;
   };
 
-  _modalProgress.on('hide.bs.modal', function() {
+
+  function modalProgress_onClose () {
     if (!progressComplete) {
       audioRecorder.cancelEncoding();
     }
-  });
+  }
 
   disableControlsOnRecord = function(disabled) {
     _audioInSelect.attr('disabled', disabled);
@@ -417,8 +417,9 @@ import jQModal from 'jquery-modal';
     if (finish) {
       audioRecorder.finishRecording();
       if (audioRecorder.options.encodeAfterRecord) {
-        _modalProgress.find('.modal-title').html("Encoding " + (audioRecorder.encoding.toUpperCase()));
-        _modalProgress.modal('show');
+	let title = "Encoding " + (audioRecorder.encoding.toUpperCase());
+        modalProgress = open(ModalProgress, {title, progress : modalProgress_progress},
+          {onClose : modalProgress_onClose});
       }
     } else {
       audioRecorder.cancelRecording();
@@ -447,7 +448,7 @@ import jQModal from 'jquery-modal';
 
   audioRecorder.onComplete = function(recorder, blob) {
     if (recorder.options.encodeAfterRecord) {
-      _modalProgress.modal('hide');
+      close(modalProgress);
     }
     saveRecording(blob, recorder.encoding);
   };
@@ -460,14 +461,17 @@ import jQModal from 'jquery-modal';
 
 </script>
 
-<!-- DOCTYPE html -->
-<html>
-  <head>
+<!-- ----------------------------------------------------------------------  -->
+
+<svelte:head>
+    <meta name="robots" content="noindex nofollow" />
+    <html lang="en" />
     <meta charset="UTF-8">
     <title>WebAudioRecorder.js demo</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
-  </head>
-  <body>
+</svelte:head>
+
+<!-- ----------------------------------------------------------------------  -->
+
     <div class="container">
       <h1><a href="https://github.com/higuma/web-audio-recorder-js">WebAudioRecorder.js</a> demo</h1>
       <p>Audio recording to WAV / OGG / MP3 with Web Audio API</p>
@@ -557,52 +561,8 @@ import jQModal from 'jquery-modal';
       <h3>Recordings</h3>
       <div id="recording-list"></div>
     </div>
-    <div id="modal-loading" class="modal fade">
-      <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title"></h4>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div id="modal-progress" class="modal fade">
-      <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title"></h4>
-          </div>
-          <div class="modal-body">
-            <div class="progress">
-              <div style="width: 0%;" class="progress-bar"></div>
-            </div>
-            <div class="text-center">0%</div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" data-dismiss="modal" class="btn">Cancel</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div id="modal-error" class="modal fade">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" data-dismiss="modal" class="close">&times;</button>
-            <h4 class="modal-title">Error</h4>
-          </div>
-          <div class="modal-body">
-            <div class="alert alert-warning"></div>
-          </div>
-          <div class="modal-footer">
-            <button type="button" data-dismiss="modal" class="btn btn-primary">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+
+    <!-- script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-    <script src="js/WebAudioRecorder.min.js"></script>
-    <script src="js/RecorderDemo.js"></script>
-  </body>
-</html>
+    <script src="js/WebAudioRecorder.min.js"></script -->
+    <!-- script src="js/RecorderDemo.js"></script -->

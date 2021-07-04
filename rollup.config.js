@@ -5,6 +5,7 @@ import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
 import css from 'rollup-plugin-css-only';
 import webWorkerLoader from 'rollup-plugin-web-worker-loader';
+import copy from 'rollup-plugin-copy';
 
 const path = require('path');
 import { copyFileSync } from 'fs';
@@ -67,11 +68,12 @@ export default {
 		}
 	},
 	/*external: [
-	  'node_modules/web-audio-recorder-js/lib/WebAudioRecorderWav.js',
-	  'node_modules/web-audio-recorder-js/lib/WebAudioRecorderOgg.js',
-	  'node_modules/web-audio-recorder-js/lib/WebAudioRecorderMp3.js',
+	  warWWlib + '/WebAudioRecorderWav.js',
+	  warWWlib + '/WebAudioRecorderOgg.js',
+	  warWWlib + '/WebAudioRecorderMp3.js',
 	  ], */
 	moduleContext: {
+	    // warWWlib/
 	  'node_modules/web-audio-recorder-js/lib/WebAudioRecorder.js': 'window',
 	  'node_modules/web-audio-recorder-js/lib/Mp3LameEncoder.min.js' : 'window'
 	},
@@ -95,8 +97,8 @@ export default {
 		resolve({
 			moduleDirectories : [
 			  'node_modules',
-			  'node_modules/web-audio-recorder-js/lib',
-			  'node_modules/web-audio-recorder-js/lib-minified',
+			  warWWlib,
+			  warWWlib + '-minified',
 			],
 
 			browser: true,
@@ -104,20 +106,22 @@ export default {
 		}),
 		commonjs(),
 		webWorkerLoader({
-		  loadPath : 'node_modules/web-audio-recorder-js/lib-minified'
+		  loadPath : warWWlib + '-minified'
 		}),
 
-		{
-		  name: 'copy-worker',
-		  load() {
-		    this.addWatchFile(path.resolve('node_modules/web-audio-recorder-js/lib/Mp3LameEncoder.min.js'));
-		  },
-		  generateBundle() {
-		    // copyWWtobuild('OggVorbisEncoder', true);
-		    copyWWtobuild('WavAudioEncoder', false);
-		    // copyWWtobuild('Mp3LameEncoder', true);
-		  }
-		},
+		copy({
+		  targets: [
+		      { src: [
+			  warWWlib + '-minified/*',
+			  warWWlib + '/Mp3LameEncoder.min.js',
+			  warWWlib + '/OggVorbisEncoder.min.js',
+			  warWWlib + '/WavAudioEncoder.min.js',
+			  warWWlib + '/WebAudioRecorder???.js'
+		      ], dest: 'public/js' },
+
+
+		  ]
+		}),
 
 		// In dev mode, call `npm run start` once
 		// the bundle has been generated
