@@ -1,3 +1,8 @@
+<svelte:options tag="war-wc-modalprogress" />
+
+
+<!-- ----------------------------------------------------------------------  -->
+
 <script>
   export let title, progress;
 
@@ -9,7 +14,7 @@
 
 <!-- ----------------------------------------------------------------------  -->
 
-    <div id="modal-progress" class="modal fade">
+    <div id="modal-progress" class="modal fade" data-modal>
       <div class="modal-dialog modal-sm">
         <div class="modal-content">
           <div class="modal-header">

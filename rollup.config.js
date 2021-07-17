@@ -81,6 +81,8 @@ export default {
 	plugins: [
 		svelte({
 			compilerOptions: {
+			  customElement: true,
+			  tag : null, // "war-wc",
 				// enable run-time checks when not in production
 				dev: !production
 			}

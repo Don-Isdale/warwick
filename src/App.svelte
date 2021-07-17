@@ -1,3 +1,8 @@
+<svelte:options tag="war-wc" />
+
+
+<!-- ----------------------------------------------------------------------  -->
+
 <script>
   import Modal from 'svelte-simple-modal';
 
@@ -26,7 +31,10 @@
 
 <!-- ----------------------------------------------------------------------  -->
 
-<Modal>
+  <war-wc-recorderdialog>
+  </war-wc-recorderdialog>
+
+<!--Modal -->
 
 <main>
 	<h1>Hello {name}!</h1>
@@ -39,9 +47,8 @@
 
 {#if recorderDialogFlag}
 {/if}
-  <RecorderDialog/>
 
-</Modal>
+<!-- /Modal -->
 
 <!-- ----------------------------------------------------------------------  -->
 

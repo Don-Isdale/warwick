@@ -1,3 +1,8 @@
+<svelte:options tag="war-wc-modalerror" />
+
+
+<!-- ----------------------------------------------------------------------  -->
+
 <script>
   export let message;
 </script>

@@ -1,3 +1,8 @@
+<svelte:options tag="war-wc-modalloading" />
+
+
+<!-- ----------------------------------------------------------------------  -->
+
 <script>
   export let title;
 </script>

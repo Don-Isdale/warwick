@@ -1,18 +1,36 @@
+<svelte:options tag="war-wc-recorderdialog" />
+
+
+<!-- ----------------------------------------------------------------------  -->
+
+
 <script>
 import { onMount } from 'svelte';
 import jQuery from 'jquery';
-let jQ = jQuery;
+// let jQ = jQuery;
+import 'WebAudioRecorder.min.js';
+import 'jquery-modal';
+
+import '@vaadin/vaadin-dialog/vaadin-dialog.js';
 
   import { getContext } from 'svelte';
-  const { open, close } = getContext('simple-modal');
+  // const { open, close } = getContext('simple-modal');
+  function open() { }
+  function close() { }
 
   import ModalLoading from './ModalLoading.svelte';
   import ModalProgress from './ModalProgress.svelte';
   import ModalError from './ModalError.svelte';
 
   let modalProgress_progress;
+  let container;
+  let vdialog;
 
  onMount(function() {
+  let host = container.parentNode.host.parentElement;
+  console.log('container=', container, 'host=', host);
+  const jQ = (query) => jQuery(query, container);
+
   let _audioInLevel, _audioInSelect, _bufferSize, _cancel, _dateTime, _echoCancellation, _encoding, _encodingOption, _encodingProcess, modalError, modalLoading, modalProgress,  _record, _recording, _recordingList, _reportInterval, _testToneLevel, _timeDisplay, _timeLimit, BUFFER_SIZE, ENCODING_OPTION, MP3_BIT_RATE, OGG_KBPS, OGG_QUALITY, URL, audioContext, audioIn, audioInLevel, audioRecorder, defaultBufSz, disableControlsOnRecord, encodingProcess, iDefBufSz, minSecStr, mixer, onChangeAudioIn, onError, onGotAudioIn, onGotDevices, optionValue, plural, progressComplete, saveRecording, setProgress, startRecording, stopRecording, testTone, testToneLevel, updateBufferSizeText, updateDateTime;
 
   navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
@@ -56,6 +74,21 @@ let jQ = jQuery;
   _dateTime = jQ('#date-time');
 
   _recordingList = jQ('#recording-list');
+
+  let modalLoadingjQ = jQ('div#modal-loading');
+  console.log('modalLoadingjQ', modalLoadingjQ);
+  modalLoadingjQ.click(function(event) {	//[data-modal]
+    jQ(this).modal();
+    return false;
+  });
+
+  if (! vdialog) {
+    console.warn('<vaadin-dialog> not found');
+  } else {
+    vdialog.renderer = function(root, vdialog) {
+      root.textContent = 'Sample dialog';
+    };
+  }
 
 
   _audioInLevel.attr('disabled', false);
@@ -122,15 +155,17 @@ let jQ = jQuery;
   mixer.connect(audioContext.destination);
 
   audioRecorder = new WebAudioRecorder(mixer, {
-    workerDir: 'js/',
+    workerDir: '/wp/wp-content/plugins/dco-comment-attachment/assets/warwc/js/',
     onEncoderLoading: function(recorder, encoding) {
       let title = "Loading " + (encoding.toUpperCase()) + " encoder ...";
-      open(ModalLoading, { title });
+      // open(ModalLoading, { title });
+      modalLoadingjQ.modal();
     }
   });
 
   audioRecorder.onEncoderLoaded = function() {
-    close(ModalLoading);
+    // close(ModalLoading);
+    modalLoadingjQ.hide();
   };
 
   _testToneLevel.on('input', function() {
@@ -457,22 +492,15 @@ let jQ = jQuery;
     onError(message);
   };
 
+
  }); // .call(this);
 
 </script>
 
 <!-- ----------------------------------------------------------------------  -->
 
-<svelte:head>
-    <meta name="robots" content="noindex nofollow" />
-    <html lang="en" />
-    <meta charset="UTF-8">
-    <title>WebAudioRecorder.js demo</title>
-</svelte:head>
 
-<!-- ----------------------------------------------------------------------  -->
-
-    <div class="container">
+    <div bind:this={container} class="container">
       <h1><a href="https://github.com/higuma/web-audio-recorder-js">WebAudioRecorder.js</a> demo</h1>
       <p>Audio recording to WAV / OGG / MP3 with Web Audio API</p>
       <hr>
@@ -560,7 +588,25 @@ let jQ = jQuery;
       <hr>
       <h3>Recordings</h3>
       <div id="recording-list"></div>
+
+    <div id="modal-loading" class="modal fade" data-modal="">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h4 class="modal-title">Loading test</h4>
+          </div>
+        </div>
+      </div>
     </div>
+
+<vaadin-dialog bind:this={vdialog} opened>
+ <p>vaadin-dialog</p>
+</vaadin-dialog>
+
+
+    </div>
+
+
 
     <!-- script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>

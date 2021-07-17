@@ -18,6 +18,7 @@
     "svelte": "^3.0.0"
   },
   "dependencies": {
+    "@vaadin/vaadin-dialog": "^20.0.0",
     "jquery": "^3.6.0",
     "jquery-modal": "^0.9.2",
     "rollup-plugin-copy": "^3.4.0",
