@@ -25,6 +25,8 @@ import '@vaadin/vaadin-dialog/vaadin-dialog.js';
   let modalProgress_progress;
   let container;
   let vdialog;
+  let lastBlobSize;
+
 
  onMount(function() {
   let host = container.parentNode.host.parentElement;
@@ -77,6 +79,7 @@ import '@vaadin/vaadin-dialog/vaadin-dialog.js';
 
   let modalLoadingjQ = jQ('div#modal-loading');
   console.log('modalLoadingjQ', modalLoadingjQ);
+  if (false) {
   modalLoadingjQ.click(function(event) {	//[data-modal]
     jQ(this).modal();
     return false;
@@ -88,6 +91,7 @@ import '@vaadin/vaadin-dialog/vaadin-dialog.js';
     vdialog.renderer = function(root, vdialog) {
       root.textContent = 'Sample dialog';
     };
+  }
   }
 
 
@@ -155,15 +159,17 @@ import '@vaadin/vaadin-dialog/vaadin-dialog.js';
   mixer.connect(audioContext.destination);
 
   audioRecorder = new WebAudioRecorder(mixer, {
-    workerDir: '/wp/wp-content/plugins/dco-comment-attachment/assets/warwc/js/',
+    workerDir: /*'js/', / */ '/wp/wp-content/plugins/dco-comment-attachment/assets/warwc/js/',
     onEncoderLoading: function(recorder, encoding) {
       let title = "Loading " + (encoding.toUpperCase()) + " encoder ...";
+      console.log('onEncoderLoading', title);
       // open(ModalLoading, { title });
       modalLoadingjQ.modal();
     }
   });
 
   audioRecorder.onEncoderLoaded = function() {
+    console.log('onEncoderLoaded');
     // close(ModalLoading);
     modalLoadingjQ.hide();
   };
@@ -373,10 +379,16 @@ import '@vaadin/vaadin-dialog/vaadin-dialog.js';
   saveRecording = function(blob, enc) {
     var html, time, url;
     time = new Date();
+    console.log('saveRecording', time.getTime(), blob.size);
+    // receiving a burst of completed events.
+    if (! lastBlobSize || (lastBlobSize !== blob.size)) {
+    console.log('lastBlobSize', lastBlobSize, (lastBlobSize !== blob.size));
+    lastBlobSize = blob.size;
     url = URL.createObjectURL(blob);
     html = ("<p recording='" + url + "'>") + ("<audio controls src='" + url + "'></audio> ") + ("(" + enc + ") " + (time.toString()) + " ") + ("<a class='btn btn-default' href='" + url + "' download='recording." + enc + "'>") + "Save..." + "</a> " + ("<button class='btn btn-danger' recording='" + url + "'>Delete</button>");
     "</p>";
     _recordingList.prepend(jQ(html));
+}
   };
 
   _recordingList.on('click', 'button', function(event) {
@@ -589,6 +601,7 @@ import '@vaadin/vaadin-dialog/vaadin-dialog.js';
       <h3>Recordings</h3>
       <div id="recording-list"></div>
 
+  <template>
     <div id="modal-loading" class="modal fade" data-modal="">
       <div class="modal-dialog modal-sm">
         <div class="modal-content">
@@ -598,10 +611,12 @@ import '@vaadin/vaadin-dialog/vaadin-dialog.js';
         </div>
       </div>
     </div>
+  </template>
 
-<vaadin-dialog bind:this={vdialog} opened>
+
+<!-- vaadin-dialog bind:this={vdialog} opened>
  <p>vaadin-dialog</p>
-</vaadin-dialog>
+</vaadin-dialog -->
 
 
     </div>

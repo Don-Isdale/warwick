@@ -4,7 +4,7 @@
 <!-- ----------------------------------------------------------------------  -->
 
 <script>
-  import Modal from 'svelte-simple-modal';
+  // import Modal from 'svelte-simple-modal';
 
 	import RecorderDialog from './RecorderDialog.svelte';
 	import  'WebAudioRecorder';
@@ -19,9 +19,15 @@
   }
 
   let recorderDialogFlag;
+  let vdialog;
 
+  console.log('App vdialog', vdialog, this);
   async function loadRecorderDialog() {
-    recorderDialogFlag = true;
+    console.log('loadRecorderDialog', vdialog, vdialog.opened, this);
+    recorderDialogFlag = ! recorderDialogFlag;
+    if (vdialog) {
+      vdialog.opened = ! vdialog.opened;
+    }
   }
 
 
@@ -30,9 +36,14 @@
 </script>
 
 <!-- ----------------------------------------------------------------------  -->
-
+<!-- add opened for initially-open -->
+<vaadin-dialog bind:this={vdialog} >
+   <template>
+ <p>vaadin-dialog</p>
   <war-wc-recorderdialog>
   </war-wc-recorderdialog>
+   </template>
+</vaadin-dialog>
 
 <!--Modal -->
 
@@ -41,7 +52,7 @@
 	<p>Visit the <a href="https://svelte.dev/tutorial">Svelte tutorial</a> to learn how to build Svelte apps.</p>
 </main>
 
-<button on:click={loadRecorderDialog()}>
+<button on:click={loadRecorderDialog}>
   Show the Recorder dialog
 </button>
 
