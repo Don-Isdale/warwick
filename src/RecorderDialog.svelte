@@ -22,16 +22,19 @@ import '@vaadin/vaadin-dialog/vaadin-dialog.js';
   import ModalProgress from './ModalProgress.svelte';
   import ModalError from './ModalError.svelte';
 
+  export let encoding;
+
   let modalProgress_progress;
   let container;
   let vdialog;
   let lastBlobSize;
 
-
  onMount(function() {
   let host = container.parentNode.host.parentElement;
   console.log('container=', container, 'host=', host);
   const jQ = (query) => jQuery(query, container);
+
+  console.log('encoding', encoding, this);
 
   let _audioInLevel, _audioInSelect, _bufferSize, _cancel, _dateTime, _echoCancellation, _encoding, _encodingOption, _encodingProcess, modalError, modalLoading, modalProgress,  _record, _recording, _recordingList, _reportInterval, _testToneLevel, _timeDisplay, _timeLimit, BUFFER_SIZE, ENCODING_OPTION, MP3_BIT_RATE, OGG_KBPS, OGG_QUALITY, URL, audioContext, audioIn, audioInLevel, audioRecorder, defaultBufSz, disableControlsOnRecord, encodingProcess, iDefBufSz, minSecStr, mixer, onChangeAudioIn, onError, onGotAudioIn, onGotDevices, optionValue, plural, progressComplete, saveRecording, setProgress, startRecording, stopRecording, testTone, testToneLevel, updateBufferSizeText, updateDateTime;
 
@@ -513,7 +516,7 @@ import '@vaadin/vaadin-dialog/vaadin-dialog.js';
 
 
     <div bind:this={container} class="container">
-      <h1><a href="https://github.com/higuma/web-audio-recorder-js">WebAudioRecorder.js</a> demo</h1>
+      <p><a href="https://github.com/higuma/web-audio-recorder-js">WebAudioRecorder.js</a> demo</p>
       <p>Audio recording to WAV / OGG / MP3 with Web Audio API</p>
       <hr>
       <div class="form-horizontal">
